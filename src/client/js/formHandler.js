@@ -36,4 +36,3 @@ async function handleSubmit(event) {
     }
 }
 
-// لا حاجة لتعيين handleSubmit على window إذا كنت تستخدمه مباشرة في addEventListener

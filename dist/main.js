@@ -1,4 +1,7 @@
 
+import { checkURL } from '../src/client/js/test/checkURL.test';
+import { checkForm } from './src/client/js/test/checkForm.test';
+
 (() => {
     "use strict";
   
@@ -13,25 +16,50 @@
     const checkForName = (name) => {
       console.log("::: Running checkForName :::", name);
       const validNames = ["Picard", "Janeway", "Kirk", "Archer", "Georgiou"];
-      alert(validNames.includes(name) ? "Welcome, Captain!" : "Enter a valid captain name");
-    };
+      
+      if (!validNames.includes(name)) {
+          alert("Enter a valid captain name");
+          return false; 
+      }
   
-    // التعامل مع إرسال النموذج
-    const handleSubmit = (event) => {
-      event.preventDefault();
-      const name = document.getElementById("name").value;
-      checkForName(name);
-      fetch("http://localhost:8000/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: name })
-      })
-      .then(response => response.json())
-      .then(data => {
-        document.getElementById("results").innerText = JSON.stringify(data);
-      })
-      .catch(error => console.error("Error:", error));
-    };
+      alert("Welcome, Captain!");
+      return true; 
+  };
+  
+  
+function handleSubmit(event) {
+    event.preventDefault();
+
+    let name = document.getElementById('name').value;
+    let url = document.getElementById('url').value;
+
+    if (!checkForm(name, url)) {  
+        return;
+    }
+
+    if (!checkForName(name)) {  
+      return;  
+  }
+  
+    if (!checkURL(url)) {  
+        alert('الرجاء إدخال رابط صحيح');
+        return;
+    }
+
+    console.log("::: Form Submitted :::");
+    fetch('http://localhost:8000/analyze', {
+        method: 'POST',
+        body: JSON.stringify({ name: name, url: url }),
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('results').innerHTML = `Analysis: ${data.message}`;
+    })
+    .catch(error => console.error("Error:", error));
+}
+
+  
   
     // إعداد الاستماع للحدث
     const form = document.getElementById("urlForm");
